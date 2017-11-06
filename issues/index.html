@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>RedmineX - issues</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" />
+<link rel="stylesheet" href="./index.css" />
+<body>
+    <div id="root" v-cloak>
+        <section class="filters">
+            <h2 class="section-title">フィルタ</h2>
+            <div class="section-content layout-row">
+                <x-issues-filter class="layout-col" v-for="column in columnsForFilter" :key="column.name" :column="column" :issues="issues" :ref="'filter_' + column.name"></x-issues-filter>
+            </div>
+        </section>
+        <section class="issues">
+            <h2 class="section-title">
+                <span>チケット({{total}})</span>
+                <button class="bulk-edit-button" v-show="isMultiIssueSelected" @click="onBulkEdit">一括編集</button>
+            </h2>
+            <div class="section-content">
+                <div class="toolbar">
+                    <button class="clear-button"  @click.stop="clearSelect">選択解除</button>
+                    <button class="clear-button"  @click.stop="clearOrders">ソート解除</button>
+                    <button class="reload-button" @click.stop="onReload">更新</button>
+                    <button class="export-button" @click.stop="onExport('text/csv')">CSV</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr is="x-issues-head-row" :columns="columns"></tr>
+                    </thead>
+                    <tbody>
+                        <tr is="x-issues-body-row" :columns="columns" :issue="issue" v-for="issue in listIssues" :key="issue.id"></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <x-loading-indicator
+            :is-shown.sync="loading.isShown"
+            :with-progress="loading.withProgress"
+            :progress-value.sync="loading.progressValue"
+            :progress-max="loading.progressMax"
+            :auto-hide="loading.autoHide"
+        ></x-loading-indicator>
+    </div>
+    <script type="x-template" id="x-input-select-template">
+        <label class="input-select">
+            <input type="checkbox" v-model="issue.selected" @change="onChange"/>
+        </label>
+    </script>
+    <script type="x-template" id="x-input-tags-template">
+        <div class="input-tags">
+            <input type="search" v-model="issue.tags" @input="onInput" />
+        </div>
+    </script>
+    <script type="x-template" id="x-input-color-template">
+        <div class="input-color">
+            <input type="color" style="width:100%" v-model="issue.color" @input="onColorInput"/>
+            <button type="button" @click="onClear">x</button>
+        </div>
+    </script>
+    <script type="x-template" id="x-issues-filter-template">
+        <fieldset class="issues-filter">
+            <legend v-html="_.isFunction(column.header.render) ? column.header.render() : column.name"></legend>
+            <label>
+                <button class="clear-button" @click="clearFilter()">クリア</button>
+            </label>
+            <label class="labeled-control" v-for="item in column.filter.create(issues)">
+                <input type="checkbox" :name="column.name" :value="item.id" v-model="column.filter.includes"/>
+                <span v-html="_.isFunction(column.filter.render) ? column.filter.render(item) : item.name"></span>
+            </label>
+        </fieldset>
+    </script>
+    <script type="x-template" id="x-issues-head-row-template">
+        <tr class="issues-head-row issues__row">
+            <th class="issues__col" :style="column.header.styles" v-for="column in columns">
+                <h4 v-html="_.isFunction(column.header.render) ? column.header.render() : column.name"></h4>
+                <span class="layout-row layout-center">
+                    <button :class="{'sort-button':true, 'sort-button--active':column.order.direction == 'asc',}" @click="setOrder(column, 'asc')">▲</button>
+                    <template v-if="column.suggest && column.suggest.use">
+                        <input type="search" class="suggest" :placeholder="column.suggest.placeholder" v-model="column.suggest.text" />
+                    </template>
+                    <button :class="{'sort-button':true, 'sort-button--active':column.order.direction == 'desc',}" @click="setOrder(column, 'desc')">▼</button>
+                </span>
+            </th>
+        </tr>
+    </script>
+    <script type="x-template" id="x-issues-body-row-template">
+        <tr class="issues-body-row issues__row" :class="classes" :style="styles">
+            <template v-for="column in columns">
+                <td v-if="_.isFunction(column.render.html)" v-html="column.render.html(issue)"></td>
+                <td v-else-if="column.render.component">
+                    <component :is="column.render.component.tagName" :column="column" :issue="issue"></component>
+                </td>
+                <td v-else>nop</td>
+            </template>
+        </tr>
+    </script>
+    <script type="x-template" id="x-loading-indicator-template">
+        <div class="loading-indicator" v-show="isShown">
+            <div class="loading-indicator__progress" v-show="withProgress != null" :style="styles" ref="progress">{{progress}}%</div>
+        </div>
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.js"></script> -->
+    <script src="../common/redmine-api.js"></script>
+    <script src="./issues_api.js"></script>
+    <script src="./issues.js"></script>
+    <script src="./index.js"></script>
+</body>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>RedmineX - time_entries</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" />
+<link rel="stylesheet" href="../common/common.css" />
+<link rel="stylesheet" href="./index.css" />
+<body>
+    <div id="root" v-cloak>
+        <section class="entries">
+            <h2 class="section-title">作業時間</h2>
+            <h3 class="section-title">一覧</h3>
+            <div class="section-content">
+                <div class="toolbar">
+                    <label class="labeled-control">
+                        <span>年月</span>
+                        <!-- <input type="month" v-model="month" @change="onMonthChange($event.target.value)"> -->
+                        <input type="month" v-model="month" @change="onMonthChange($event.target.value)">
+                    </label>
+                </div>
+                <table class="time-entries">
+                    <thead>
+                        <tr>
+                            <th>日付</th>
+                            <th>チケットID</th>
+                            <th>時間(h)</th>
+                            <th>活動</th>
+                            <th>コメント</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td class="sum">{{_.sumBy(listEntries, "hours")}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(entries, spent_on) in _.groupBy(listEntries, 'spent_on')">
+                            <tr class="spent-on">
+                                <td>{{spent_on}}</td>
+                                <td></td>
+                                <td class="sum">{{_.sumBy(entries, "hours")}}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr is="x-time-entry"
+                                v-for="entry in entries"
+                                :key="entry.id"
+                                :entry="entry"
+                                @register-entry="onRegisterEntry(entry)"
+                                @edit-entry="onEditEntry(entry)"
+                                @delete-entry="onDeleteEntry(entry)"
+                                class="entry"
+                                >
+                            </tr>
+                        </template>
+
+                    </tbody>
+                </table>
+            </div>
+            <h3 class="section-title">インポート</h3>
+            <div class="section-content layout-row">
+                <div>
+                    <input type="file" @change="onImport"/>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script type="x-template" id="x-time-entry-template">
+        <tr>
+            <td></td>
+            <td>
+                <a :href="issuesURL" target="_blank">{{entry.issue.id}}</a>
+            </td>
+            <td>{{entry.hours}}</td>
+            <td>{{entry.activity.name}}</td>
+            <td>{{entry.comments}}</td>
+            <td>
+                <button @click="onEdit(entry)">編集</button>
+            </td>
+            <td>
+                <button @click="onDelete(entry)">削除</button>
+            </td>
+        </tr>
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.js"></script> -->
+    <script src="../common/redmine-api.js"></script>
+    <script src="../common/io-util.js"></script>
+    <script src="../common/date-util.js"></script>
+    <script src="./time_entries_api.js"></script>
+    <script src="./time_entries.js"></script>
+    <script src="./index.js"></script>
+</body>

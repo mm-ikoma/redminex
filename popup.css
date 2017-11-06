@@ -1,0 +1,11 @@
+#root {
+    width: 10rem;
+    background: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+button:not(:first-child ){
+    margin-top:1rem;
+}

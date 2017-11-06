@@ -1,0 +1,59 @@
+@import "../common/common.css";
+
+#root {
+    width: 100%;
+}
+
+.issues-filter:not(:first-child){
+    margin-left: var(--space-md);
+}
+
+.issues table {
+    width: 100%;
+}
+
+.header-text {
+    display: inline-block;
+    padding: var(--space-sm);
+}
+
+.sort-button {}
+
+.sort-button--active {
+    color: var(--primary-text);
+}
+
+.clear-button, .reload-button, .export-button, .bulk-edit-button {
+    width: var(--button-width);
+}
+
+.bulk-edit-button {
+    margin-left: var(--space-md);
+}
+
+.issues__row:nth-child(even) {
+    background-color: var(--background-color);
+}
+
+.issues__row.issues__row--selected {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+}
+
+.suggest {
+    width: 12rem;
+    margin: 0 .25rem;
+}
+
+.input-select {
+    display: flex;
+    justify-content: center;
+}
+
+.input-tags input {
+    width: 100%;
+}
+
+.input-color {
+    display: flex;
+}

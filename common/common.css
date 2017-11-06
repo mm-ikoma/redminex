@@ -1,0 +1,171 @@
+@import url(https://fonts.googleapis.com/earlyaccess/notosansjp.css);
+
+/* 変数 */
+
+:root {
+    --primary-color: rgb(63, 81, 181);
+    --primary-text: rgb(255, 255, 255);
+    --accent-color: rgb(255, 171, 64);
+    --accent-text: rgb(66, 66, 66);
+    --background-color: #efefef;
+    --button-width: 6rem;
+    --space-sm: 0.25rem;
+    --space-md: 0.5rem;
+    --space-lg: 1rem;
+    --radius-md: 5px;
+}
+
+/* 要素 */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans JP';
+    /*font-size:.8vw;*/
+    font-size:16px;
+}
+
+input[type='checkbox'] {
+    transform: scale(1.5);
+    transform-origin: center;
+}
+
+button {
+    -webkit-appearance: none;
+    border: none;
+    border-radius: var(--radius-md);
+    background-color: var(--accent-color);
+    color: var(--accent-text);
+    padding: 0 var(--space-sm);
+    cursor: pointer;
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3);
+    outline: none;
+    line-height: 1.4rem;
+    font-size: 0.9rem;
+}
+
+button:hover {
+    color: var(--primary-text);
+}
+
+button:active {
+    box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+button:disabled{
+    background-color: #eee;
+    color: #ccc;
+}
+
+label {
+    padding: var(--space-md);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+}
+
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: var(--space-sm);
+    border: 1px solid #ccc;
+}
+
+/* レイアウト */
+
+.layout-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.layout-center {
+    align-items: center;
+    justify-content: center;
+}
+
+.section-title {
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+    padding: var(--space-md);
+    margin: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+}
+
+.section-content {
+    font-size: 0.9rem;
+    padding: var(--space-md);
+}
+
+/* コンポーネント */
+
+[v-cloak] {
+    display: none;
+}
+
+.loading-indicator {
+    position: fixed;
+    background-color: rgba(0, 0, 0, .5);
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    user-select: none;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.loading-indicator__progress {
+    font-size: 2rem;
+    color: #fff;
+    text-align: right;
+    background-color: var(--accent-color);
+    transition: width .5s ease-in-out;
+    padding: var(--space-md);
+}
+
+.labeled-control {
+    display: flex;
+    align-items: center;
+}
+
+.labeled-control:hover {
+    background-color: var(--accent-color);
+    color:var(--primary-text);
+}
+
+.labeled-control span:first-child{
+    margin-right: .5em;
+}
+
+.labeled-control span:last-child{
+    margin-left: .5em;
+}
+
+.toolbar {
+    padding-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    height:3rem;
+}
+
+.toolbar > *:not(:first-child) {
+    margin-left: var(--space-lg);
+}

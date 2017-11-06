@@ -1,0 +1,13 @@
+.time-entries td:nth-child(2),
+.time-entries td:nth-child(3) {
+    text-align: right;
+}
+
+tr.spent-on{
+    border-top:3px double;
+}
+
+td.sum {
+    color:var(--accent-color);
+    font-weight: bold;
+}
