@@ -14,14 +14,15 @@
         <section class="issues">
             <h2 class="section-title">
                 <span>チケット({{total}})</span>
-                <button class="bulk-edit-button" v-show="isMultiIssueSelected" @click="onBulkEdit">一括編集</button>
+                <button class="bulk-edit-button" v-show="1 < selectedCount" @click="onBulkEdit">一括編集({{selectedCount}})</button>
             </h2>
             <div class="section-content">
                 <div class="toolbar">
                     <button class="clear-button"  @click.stop="clearSelect">選択解除</button>
                     <button class="clear-button"  @click.stop="clearOrders">ソート解除</button>
+                    <button class="export-button" @click.stop="onCheckDuplicate">重複チェック</button>
+                    <button class="export-button" @click.stop="onExport('text/csv')">CSV出力</button>
                     <button class="reload-button" @click.stop="onReload">更新</button>
-                    <button class="export-button" @click.stop="onExport('text/csv')">CSV</button>
                 </div>
                 <table>
                     <thead>
@@ -71,14 +72,14 @@
     </script>
     <script type="x-template" id="x-issues-head-row-template">
         <tr class="issues-head-row issues__row">
-            <th class="issues__col" :style="column.header.styles" v-for="column in columns">
-                <h4 v-html="_.isFunction(column.header.render) ? column.header.render() : column.name"></h4>
+            <th class="issues__col" :style="{width: column.header.width}" v-for="column in columns">
+                <h4 v-html="_.result(column.header, 'render')"></h4>
                 <span class="layout-row layout-center">
-                    <button :class="{'sort-button':true, 'sort-button--active':column.order.direction == 'asc',}" @click="setOrder(column, 'asc')">▲</button>
+                    <button :class="['sort-button',{'sort-button--active':column.order.direction == 'asc'}]" @click="setOrder(column, 'asc')">▲</button>
                     <template v-if="column.suggest && column.suggest.use">
-                        <input type="search" class="suggest" :placeholder="column.suggest.placeholder" v-model="column.suggest.text" />
+                        <input type="search" class="suggest" :placeholder="column.suggest.placeholder" :style="column.suggest.styles" v-model="column.suggest.text" />
                     </template>
-                    <button :class="{'sort-button':true, 'sort-button--active':column.order.direction == 'desc',}" @click="setOrder(column, 'desc')">▼</button>
+                    <button :class="['sort-button',{'sort-button--active':column.order.direction == 'desc'}]" @click="setOrder(column, 'desc')">▼</button>
                 </span>
             </th>
         </tr>
@@ -86,11 +87,11 @@
     <script type="x-template" id="x-issues-body-row-template">
         <tr class="issues-body-row issues__row" :class="classes" :style="styles">
             <template v-for="column in columns">
-                <td v-if="_.isFunction(column.render.html)" v-html="column.render.html(issue)"></td>
-                <td v-else-if="column.render.component">
-                    <component :is="column.render.component.tagName" :column="column" :issue="issue"></component>
+                <td v-if="column.view.html" v-html="column.view.html.render(issue)" :class="column.view.html.classes"></td>
+                <td v-else-if="column.view.component">
+                    <component :is="column.view.component.tagName" :column="column" :issue="issue"></component>
                 </td>
-                <td v-else>nop</td>
+                <td v-else>;o;</td>
             </template>
         </tr>
     </script>

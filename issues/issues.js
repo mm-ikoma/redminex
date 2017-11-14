@@ -1,27 +1,28 @@
 const Issues = class Issues {
 
     constructor(baseUrl, params) {
+
+        let base = document.createElement("base");
+        base.href = baseUrl;
+        document.head.appendChild(base);
+
         this.api = new IssuesAPI(baseUrl);
         this.params = params;
         this.columns = [
             {
                 name: "selected",
                 header: {
-                    styles: {
-                        width: "4rem"
-                    },
-                    render: function() {
-                        return "選択"
-                    }
+                    width: "4rem",
+                    render: "選択",
                 },
                 order: {
                     valueProvider: function(issue) {
-                        return issue.tags;
+                        return issue.selected;
                     },
                     priority: -1,
                     direction: ""
                 },
-                render: {
+                view: {
                     component: {
                         tagName: "x-input-select",
                         options: {
@@ -46,34 +47,39 @@ const Issues = class Issues {
             }, {
                 name: "id",
                 header: {
-                    styles: {
-                        width: "4rem"
-                    },
-                    render: function() {
-                        return "ID";
-                    }
+                    width: "8rem",
+                    render: "ID",
                 },
                 order: {
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        return `<a href="${baseUrl}issues/${issue.id}" target="_blank" tabindex="-1">${issue.id}</a>`;
+                view: {
+                    html: {
+                        render: function(issue) {
+                            return `<a href="issues/${issue.id}" target="_blank" tabindex="-1">${issue.id}</a>`;
+                        },
+                        classes: [
+                            "number"
+                        ]
                     }
                 },
                 export: function(issue) {
                     return issue.id;
+                },
+                suggest: {
+                    use: true,
+                    text: "",
+                    placeholder: "例:777",
+                    styles: {
+                        width:"4rem",
+                    }
                 }
             }, {
                 name: "parent",
                 header: {
-                    styles: {
-                        width: "6rem"
-                    },
-                    render: function() {
-                        return "Parent ID";
-                    }
+                    width: "6rem",
+                    render: "Parent ID",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -85,9 +91,16 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        return `<a href="${baseUrl}issues/${issue.parent.id}" target="_blank" tabindex="-1">${issue.parent.id}</a>`;
+                view: {
+                    html: {
+                        render: function(issue) {
+                            if (issue.parent) {
+                                return `<a href="issues/${issue.parent.id}" target="_blank" tabindex="-1">${issue.parent.id}</a>`;
+                            }
+                        },
+                        classes: [
+                            "number"
+                        ]
                     }
                 },
                 export: function(issue) {
@@ -106,12 +119,8 @@ const Issues = class Issues {
             }, {
                 name: "priority",
                 header: {
-                    styles: {
-                        width: "4rem"
-                    },
-                    render: function() {
-                        return "優先度";
-                    }
+                    width: "4rem",
+                    render: "優先度",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -120,9 +129,11 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        return issue.priority.name;
+                view: {
+                    html: {
+                        render: function(issue) {
+                            return issue.priority.name;
+                        }
                     }
                 },
                 filter: {
@@ -138,12 +149,8 @@ const Issues = class Issues {
             }, {
                 name: "status",
                 header: {
-                    styles: {
-                        width: "6rem"
-                    },
-                    render: function() {
-                        return "ステータス";
-                    }
+                    width: "6rem",
+                    render: "ステータス",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -152,9 +159,11 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        return issue.status.name;
+                view: {
+                    html: {
+                        render: function(issue) {
+                            return issue.status.name;
+                        }
                     }
                 },
                 filter: {
@@ -170,20 +179,17 @@ const Issues = class Issues {
             }, {
                 name: "subject",
                 header: {
-                    render: function() {
-                        return "題名"
-                    }
+                    render: "題名",
                 },
                 order: {
-                    // valueProvider: function(issue){
-                    //     return issue.subject;
-                    // },
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        return issue.subject;
+                view: {
+                    html: {
+                        render: function(issue) {
+                            return issue.subject;
+                        }
                     }
                 },
                 suggest: {
@@ -194,12 +200,8 @@ const Issues = class Issues {
             }, {
                 name: "author",
                 header: {
-                    styles: {
-                        width: "6rem"
-                    },
-                    render: function() {
-                        return "起票者"
-                    }
+                    width: "6rem",
+                    render: "起票者",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -208,24 +210,22 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        let offset = issue.author.name.indexOf("】");
-                        if (- 1 < offset) {
-                            return issue.author.name.substr(offset + 1);
+                view: {
+                    html: {
+                        render: function(issue) {
+                            let offset = issue.author.name.indexOf("】");
+                            if (- 1 < offset) {
+                                return issue.author.name.substr(offset + 1);
+                            }
+                            return issue.author.name;
                         }
-                        return issue.author.name;
                     }
                 }
             }, {
                 name: "assigned_to",
                 header: {
-                    styles: {
-                        width: "6rem"
-                    },
-                    render: function() {
-                        return "担当者"
-                    }
+                    width: "6rem",
+                    render: "担当者",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -237,14 +237,16 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        if (issue.assigned_to) {
-                            let offset = issue.assigned_to.name.indexOf("】");
-                            if (- 1 < offset) {
-                                return issue.assigned_to.name.substr(offset + 1);
+                view: {
+                    html: {
+                        render: function(issue) {
+                            if (issue.assigned_to) {
+                                let offset = issue.assigned_to.name.indexOf("】");
+                                if (- 1 < offset) {
+                                    return issue.assigned_to.name.substr(offset + 1);
+                                }
+                                return issue.assigned_to.name;
                             }
-                            return issue.assigned_to.name;
                         }
                     }
                 },
@@ -276,12 +278,8 @@ const Issues = class Issues {
             }, {
                 name: "created_on",
                 header: {
-                    styles: {
-                        width: "9rem"
-                    },
-                    render: function() {
-                        return "起票日"
-                    }
+                    width: "9rem",
+                    render: "起票日",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -290,21 +288,42 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
-                    html: function(issue) {
-                        var createdOn = new Date(issue.created_on).toLocaleString();
-                        return createdOn.substr(0, createdOn.lastIndexOf(":"));
+                view: {
+                    html: {
+                        render: function(issue) {
+                            var createdOn = new Date(issue.created_on).toLocaleString();
+                            return createdOn.substr(0, createdOn.lastIndexOf(":"));
+                        }
+                    }
+                }
+            }, {
+                name: "estimated_hours",
+                header: {
+                    width: "5rem",
+                    render: "予定工数",
+                },
+                order: {
+                    valueProvider: function(issue) {
+                        return issue.estimated_hours;
+                    },
+                    priority: -1,
+                    direction: ""
+                },
+                view: {
+                    html: {
+                        render: function(issue) {
+                            return issue.estimated_hours;
+                        },
+                        classes: [
+                            "number"
+                        ]
                     }
                 }
             }, {
                 name: "tag",
                 header: {
-                    styles: {
-                        width: "12rem"
-                    },
-                    render: function() {
-                        return "タグ"
-                    }
+                    width: "12rem",
+                    render: "タグ",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -313,7 +332,7 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
+                view: {
                     component: {
                         tagName: "x-input-tags",
                         options: {
@@ -338,12 +357,8 @@ const Issues = class Issues {
             }, {
                 name: "color",
                 header: {
-                    styles: {
-                        width: "4rem"
-                    },
-                    render: function() {
-                        return "色"
-                    }
+                    width: "4rem",
+                    render: "色",
                 },
                 order: {
                     valueProvider: function(issue) {
@@ -352,7 +367,7 @@ const Issues = class Issues {
                     priority: -1,
                     direction: ""
                 },
-                render: {
+                view: {
                     component: {
                         tagName: "x-input-color",
                         options: {
@@ -377,7 +392,7 @@ const Issues = class Issues {
                 export: function(issue) {
                     return issue.color;
                 }
-            }
+            },
         ];
     }
 
@@ -387,8 +402,8 @@ const Issues = class Issues {
 
         // 列コンポーネントを登録
         for (const column of this.columns) {
-            if (column.render.component) {
-                Vue.component(column.render.component.tagName, column.render.component.options);
+            if (column.view.component) {
+                Vue.component(column.view.component.tagName, column.view.component.options);
             }
         }
 
@@ -402,6 +417,12 @@ const Issues = class Issues {
                     issue.selected = selected == "true";
                 } else {
                     issue.selected = false;
+                }
+                let duplicated = localStorage.getItem(`duplicated-${issue.id}`);
+                if (duplicated) {
+                    issue.duplicated = duplicated == "true";
+                } else {
+                    issue.duplicated = false;
                 }
             }
             return issues;
@@ -465,7 +486,10 @@ const Issues = class Issues {
                     },
                     computed: {
                         classes: function() {
-                            return {"issues__row--selected": this.issue.selected}
+                            return {
+                                "issues__row--selected": this.issue.selected,
+                                "issues__row--duplicated": this.issue.duplicated
+                            }
                         },
                         styles: function() {
                             if (this.issue.color) {
@@ -517,7 +541,6 @@ const Issues = class Issues {
                 }
             },
             data: {
-                baseUrl: this.baseUrl,
                 issues: [],
                 columns: this.columns,
                 loading: {
@@ -550,8 +573,9 @@ const Issues = class Issues {
                     vm.loading.isShown = true;
                     let issues = await me.api.all({
                         "project_id": 10,
-                        "created_on": ">=2017-08-18",
+                        "created_on": ">=2017-10-01",
                         "sort": "created_on:desc",
+                        "include":"relations",
                     },{
                         start: function(total) {
                             vm.loading.progressMax = total;
@@ -563,10 +587,30 @@ const Issues = class Issues {
                             vm.loading.progressValue = actual;
                         }
                     });
-                    var filteredIssues = _.filter(issues, (issue) => {
-                        return issue.parent && -1 < me.params.parents.indexOf(issue.parent.id);
-                    });
-                    this.issues = mergeAppData(filteredIssues);
+                        // .filter(issue => {
+                        //     return issue.parent && -1 < me.params.parents.indexOf(issue.parent.id);
+                        // })
+                        // .filter(issue => {
+                        //     return issue.parent && -1 < me.params.parents.indexOf(issue.parent.id);
+                        // })
+                        // .value();
+                    if (me.params.relations) {
+                        if (!_.isArray(me.params.relations)) {
+                            me.params.relations = me.params.relations.split(",").map(relation => Number(relation));
+                        }
+                        this.issues = mergeAppData(_.filter(issues, issue => {
+                            if (issue.relations) {
+                                let relatedIssueIds = issue.relations.map((relation)=>{
+                                    return relation.issue_id;
+                                });
+                                let intersect = _.intersection(me.params.relations, relatedIssueIds);
+                                return 0 < intersect.length
+                            }
+                            return false;
+                        }));
+                    } else {
+                        this.issues = mergeAppData(issues);
+                    }
                 },
                 onExport: async function(media) {
                     switch (media) {
@@ -591,10 +635,10 @@ const Issues = class Issues {
                                     let cell = "";
                                     if (_.isFunction(column.export)) {
                                         cell = column.export(issue);
-                                    } else if (_.isFunction(column.render.html)) {
-                                        cell = column.render.html(issue);
+                                    } else if (column.view.html) {
+                                        cell = column.view.html.render(issue);
                                     } else {
-                                        cell = "error!";
+                                        cell = ";o;";
                                     }
                                     line.push(escape(cell));
                                 }
@@ -609,9 +653,20 @@ const Issues = class Issues {
                         default:
                     }
                 },
+                onCheckDuplicate : async function() {
+                    for (let issue of this.listIssues) {
+                        let relations = await me.api.relations(issue.id);
+                        let duplicate = _.find(relations, (relation) => {
+                            return relation["relation_type"] == "duplicates" && relation["issue_id"] == issue.id;
+                        });
+                        if (duplicate) {
+                            issue.duplicated = true;
+                        }
+                    }
+                },
                 onBulkEdit: function() {
                     let ids = _(this.issues).filter((issue) => issue.selected).map((issue) => `ids[]=${issue.id}`).value().join("&");
-                    window.open(encodeURI(`${this.baseUrl}issues/bulk_edit?${ids}`), '_blank');
+                    window.open(encodeURI(`issues/bulk_edit?${ids}`), '_blank');
                 }
             },
             computed: {
@@ -659,7 +714,8 @@ const Issues = class Issues {
                         }
                         for (var column of me.columnsForSuggest) {
                             if (0 < column.suggest.text.length) {
-                                if (!_.isString(issue[column.name]) || issue[column.name].indexOf(column.suggest.text) == -1) {
+                                // if (!_.isString(issue[column.name]) || issue[column.name].indexOf(column.suggest.text) == -1) {
+                                if (String(issue[column.name]).indexOf(column.suggest.text) == -1) {
                                     return false;
                                 }
                             }
@@ -667,9 +723,8 @@ const Issues = class Issues {
                         return true;
                     }).orderBy(sortValueProviders, sortDirections).value();
                 },
-                isMultiIssueSelected: function() {
-                    const selectedCount = _.countBy(this.issues, "selected");
-                    return selectedCount["true"] && 1 < selectedCount["true"];
+                selectedCount: function() {
+                    return _.countBy(this.issues, "selected")["true"];
                 }
             }
         });

@@ -12,13 +12,49 @@ const Memo = class Memo {
         const vm = new Vue({
             el: "#root",
             components: {
-                [XDialog.tagName()]: XDialog.options(),
+                "x-input-dialog": XDialog.options({
+                    template: "#x-input-dialog-template",
+                    data: function(){
+                        return {
+                            value: "",
+                            error: "",
+                        }
+                    },
+                    props: {
+                        memoNames: {
+                            type: Array,
+                        },
+                    },
+                    computed: {
+                        availableName: function(){
+                            if (!this.value) {
+                                this.error = "作成するメモの名前を入力してください";
+                                return false;
+                            }
+                            if(-1 < _.indexOf(this.memoNames, this.value)){
+                                this.error = `${this.value}は既に存在します`;
+                                return false;
+                            }
+                            this.error = "";
+                            return true;
+                        }
+                    },
+                }),
+                "x-delete-dialog": XDialog.options({
+                    template: "#x-delete-dialog-template",
+                    props: {
+                        value: {
+                            type: String,
+                        },
+                    },
+                }),
             },
             data: {
                 memo: "",
                 memoNames: [],
                 selectedMemoName: "",
-                dialogOpened: false,
+                inputDialogOpened: false,
+                deleteDialogOpened: false,
             },
             methods: {
                 listMemoNames: function(){
@@ -32,26 +68,32 @@ const Memo = class Memo {
                 },
                 onInput: _.debounce(function(){
                     if (this.selectedMemoName) {
-                        this.save(this.selectedMemoName, this.memo);
+                        this.setMemo(this.selectedMemoName, this.memo);
                     }
                 }, 200),
-                onCreate: function(){
-                    this.dialogOpened = true;
-                },
-                onDelete: function(){
-
-                },
-                onDialogClosed: function(message){
+                onInputDialogClosed: function(message){
                     if (message && message.result) {
                         let newMemoName = message.value;
-                        this.save(newMemoName, this.memo);
+                        this.setMemo(newMemoName, "");
                         this.selectedMemoName = newMemoName;
                         this.memoNames = this.listMemoNames();
                     }
-                    this.dialogOpened = false;
+                    this.inputDialogOpened = false;
                 },
-                save: function(name, memo){
+                onDeleteDialogClosed: function(message){
+                    if (message && message.result) {
+                        let deleteMemoName = message.value;
+                        this.removeMemo(deleteMemoName);
+                        this.selectedMemoName = "";
+                        this.memoNames = this.listMemoNames();
+                    }
+                    this.deleteDialogOpened = false;
+                },
+                setMemo: function(name, memo){
                     localStorage.setItem(`memo-${name}`, memo);
+                },
+                removeMemo: function(name){
+                    localStorage.removeItem(`memo-${name}`);
                 }
             },
             computed: {
@@ -63,7 +105,11 @@ const Memo = class Memo {
             },
             watch: {
                 selectedMemoName: function(){
-                    this.memo = localStorage.getItem(`memo-${this.selectedMemoName}`);
+                    if (this.selectedMemoName) {
+                        this.memo = localStorage.getItem(`memo-${this.selectedMemoName}`);
+                    } else {
+                        this.memo = "";
+                    }
                 }
             },
             created: function(){

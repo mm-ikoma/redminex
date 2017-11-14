@@ -1,17 +1,12 @@
 const XDialog = class XDialog {
-    static tagName (){
-        return "x-dialog";
-    }
-    static options(){
+
+    static options(mixin){
         return {
-            template: "#x-dialog-template",
+            mixins:[mixin],
             props: {
                 opened: {
                     type: Boolean,
                     default: false,
-                },
-                memoNames: {
-                    type: Array,
                 },
                 hasOK: {
                     type: Boolean,
@@ -21,26 +16,6 @@ const XDialog = class XDialog {
                     type: Boolean,
                     default: true
                 },
-            },
-            data: function(){
-                return {
-                    value: "",
-                    error: "",
-                }
-            },
-            computed: {
-                availableName: function(){
-                    if (!this.value) {
-                        this.error = "作成するメモの名前を入力してください";
-                        return false;
-                    }
-                    if(-1 < _.indexOf(this.memoNames, this.value)){
-                        this.error = `${this.value}は既に存在します`;
-                        return false;
-                    }
-                    this.error = "";
-                    return true;
-                }
             },
             methods: {
                 close:function(okOrCancel){

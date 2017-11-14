@@ -31,6 +31,10 @@
     margin-left: var(--space-md);
 }
 
+.issues__row {
+    position: relative;
+}
+
 .issues__row:nth-child(even) {
     background-color: var(--background-color);
 }
@@ -38,6 +42,16 @@
 .issues__row.issues__row--selected {
     background-color: var(--accent-color);
     color: var(--primary-color);
+}
+
+.issues__row.issues__row--duplicated {
+    background-color: #666;
+    color: #fff;
+    text-decoration: line-through;
+}
+
+.number{
+    text-align: right;
 }
 
 .suggest {

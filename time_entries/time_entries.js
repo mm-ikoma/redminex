@@ -57,7 +57,8 @@ const TimeEntries = class TimeEntries {
                     progressMax: 1,
                     progressValue: 0,
                     autoHide: true
-                }
+                },
+                importEntries: [],
             },
             methods: {
                 onMonthChange(value){
@@ -89,7 +90,7 @@ const TimeEntries = class TimeEntries {
                     console.log("delete", entry);
                 },
                 async onImport(evt){
-                    this.entries.length = 0;
+                    this.importEntries.length = 0;
                     let file = evt.target.files[0];
                     let reader = new XFileReader()
                     let result = await reader.readAsText(file);
@@ -109,7 +110,7 @@ const TimeEntries = class TimeEntries {
                                 comments: cells[4],
                             };
                             if (this.validEntry(entry)) {
-                                this.entries.push(entry);
+                                this.importEntries.push(entry);
                             }
                         }
                     }

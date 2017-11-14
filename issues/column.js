@@ -1,0 +1,3 @@
+const Column = class Column {
+    
+}

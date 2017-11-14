@@ -1,62 +1,101 @@
-html,
-body {
-    height:100%;
-    width:100%;
+html, body {
+    height: 100%;
+    width: 100%;
 }
 
-#root,
+:root{
+    --editor-width:40rem;
+}
+
+#root {
+    height: 100%;
+}
+
 .memo {
-    height:100%;
+    min-height: 100%;
 }
 
-.section-content{
-    height:calc(100% - 3rem);
-    padding:0;
-}
-
-.toolbar{
-    padding: var(--space-md);
-}
-
-.memo-editor{
-    flex-basis: 40rem;
-}
-
-.memo-preview{
-    padding:0 var(--space-sm);
+.section-content {
     flex-grow: 1;
 }
 
-textarea{
-    border:none;
+.toolbar {
+    border-bottom: 1px solid var(--background-color);
+}
+
+.toolbar .memo-names {
+    width: 20rem;
+}
+
+.content {
+    padding-top: var(--space-md);
+    flex-grow: 1;
+}
+
+.memo-editor {
+    min-width: var(--editor-width);
+}
+
+.memo-preview {
+    padding: 0 var(--space-sm);
+    flex-grow: 1;
+    max-width: calc(100% - var(--editor-width));
+}
+
+textarea {
+    border: none;
     resize: none;
     outline: none;
-    height:100%;
+    height: 100%;
     width: 100%;
-    padding:var(--space-sm);
+    padding: var(--space-sm);
     transition-duration: .2s;
 }
 
-textarea:hover{
-    background-color: var(--primary-color);
-    color:#fff;
+.memo-editor--disabled::before{
+    content: "メモを作成または選択してください"
 }
 
-.dialog__content .error{
+dialog {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+dialog::backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog .container {
+    width: 20rem;
+    height: 8rem;
+    justify-content: space-between;
+}
+
+dialog .labeled-control input {
+    flex-grow: 1;
+}
+
+.dialog__content .error {
     display: flex;
     justify-content: center;
-    color:crimson;
+    color: crimson;
 }
 
-.dialog__footer{
+.dialog__footer {
     display: flex;
     justify-content: space-around;
 }
 
-.dialog__footer button{
+.dialog__footer button {
     flex-grow: 1;
 }
 
-.dialog__footer button:nth-last-child(1){
-    margin-left:var(--space-lg);
+.dialog__footer button:nth-last-child(1) {
+    margin-left: var(--space-lg);
 }

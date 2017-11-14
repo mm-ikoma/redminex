@@ -9,43 +9,59 @@
 <link rel="stylesheet" href="./github-markdown.css" />
 <body>
     <div id="root" v-cloak>
-        <section class="memo">
+        <section class="memo layout-col">
             <h2 class="section-title">メモ</h2>
             <div class="section-content layout-col">
                 <div class="toolbar">
                     <label class="labeled-control" v-if="0 < memoNames.length">
                         <span>名前</span>
-                        <select v-model="selectedMemoName">
+                        <select class="memo-names" v-model="selectedMemoName">
                             <option v-for="memoName in memoNames" :value="memoName">{{memoName}}</option>
                         </select>
                     </label>
-                    <button @click="onCreate">作成</button>
-                    <button @click="onDelete">削除</button>
+                    <button @click="inputDialogOpened  = true">作成</button>
+                    <button @click="deleteDialogOpened = true" :disabled="!selectedMemoName">削除</button>
                 </div>
-                <div class="layout-row">
-                    <div class="memo-editor">
-                        <textarea v-model="memo" @input="onInput"></textarea>
+                <div class="content layout-row">
+                    <div :class="['memo-editor', {'memo-editor--disabled': !selectedMemoName}]">
+                        <textarea v-model="memo" @input="onInput" v-show="selectedMemoName" placeholder="Markdown記法を利用可能です"></textarea>
                     </div>
                     <div class="memo-preview markdown-body" v-html="preview"></div>
                 </div>
             </div>
         </section>
-        <x-dialog :opened="dialogOpened" :memo-names="memoNames" @closed="onDialogClosed"></x-dialog>
+        <x-input-dialog :opened="inputDialogOpened"   @closed="onInputDialogClosed" :memo-names="memoNames">
+        </x-input-dialog>
+        <x-delete-dialog :opened="deleteDialogOpened" @closed="onDeleteDialogClosed" :value="selectedMemoName">
+        </x-delete-dialog>
     </div>
-    <script type="x-template" id="x-dialog-template">
-        <dialog class="dialog fixed" ref="dialog">
-            <div class="dialog__header">
-            </div>
-            <div class="dialog__content">
-                <label class="labeled-control">
+    <script type="x-template" id="x-input-dialog-template">
+        <dialog class="fixed" ref="dialog">
+            <div class="container layout-col">
+                <div class="dialog__content">
+                    <label class="labeled-control">
                     <span>名前</span>
                     <input type="text" v-model="value" placeholder="新規メモ名" />
-                </label>
-                <p class="error">{{error}}</p>
+                    </label>
+                    <p class="error">{{error}}</p>
+                </div>
+                <div class="dialog__footer">
+                    <button v-if="hasOK"     @click="close(true)" :disabled="!availableName">OK</button>
+                    <button v-if="hasCancel" @click="close(false)">Cancel</button>
+                </div>
             </div>
-            <div class="dialog__footer">
-                <button v-if="hasOK"     @click="close(true)" :disabled="!availableName">OK</button>
-                <button v-if="hasCancel" @click="close(false)">Cancel</button>
+        </dialog>
+    </script>
+    <script type="x-template" id="x-delete-dialog-template">
+        <dialog class="fixed" ref="dialog" >
+            <div class="container layout-col">
+                <div class="dialog__content">
+                    <p>「{{value}}」を削除します。よろしいですか？</p>
+                </div>
+                <div class="dialog__footer">
+                    <button v-if="hasOK"     @click="close(true)">OK</button>
+                    <button v-if="hasCancel" @click="close(false)">Cancel</button>
+                </div>
             </div>
         </dialog>
     </script>
@@ -55,6 +71,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js"></script>
+    <script src="../common/storage.js"></script>
     <script src="./x-dialog.js"></script>
     <script src="./memo.js"></script>
     <script src="./index.js"></script>
